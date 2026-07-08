@@ -52,7 +52,8 @@ def evaluate_physio():
     all_preds, all_labels, all_probs = np.array(all_preds), np.array(all_labels), np.array(all_probs)
     class_names = ["Calm", "Stress", "Amusement"]
 
-    compute_metrics(all_labels, all_preds, config.PHYSIO_NUM_CLASSES, class_names)
+    compute_metrics(all_labels, all_preds, config.PHYSIO_NUM_CLASSES, class_names,
+                    os.path.join(config.PLOT_DIR, "physio_evaluation_report.txt"))
     plot_confusion_matrix(all_labels, all_preds, class_names, "PhysioNet Confusion Matrix",
                           os.path.join(config.PLOT_DIR, "physio_confusion_matrix.png"))
     plot_roc_curve(all_labels, all_probs, config.PHYSIO_NUM_CLASSES, class_names, "PhysioNet ROC Curve",
@@ -85,7 +86,8 @@ def evaluate_facial():
     all_preds, all_labels, all_probs = np.array(all_preds), np.array(all_labels), np.array(all_probs)
     class_names = ["Non-Stress", "Stress"]
 
-    compute_metrics(all_labels, all_preds, config.FACIAL_NUM_CLASSES, class_names)
+    compute_metrics(all_labels, all_preds, config.FACIAL_NUM_CLASSES, class_names,
+                    os.path.join(config.PLOT_DIR, "facial_evaluation_report.txt"))
     plot_confusion_matrix(all_labels, all_preds, class_names, "FacialNet Confusion Matrix",
                           os.path.join(config.PLOT_DIR, "facial_confusion_matrix.png"))
     plot_roc_curve(all_labels, all_probs, config.FACIAL_NUM_CLASSES, class_names, "FacialNet ROC Curve",
@@ -129,7 +131,8 @@ def evaluate_fusion():
     all_preds, all_labels, all_probs = np.array(all_preds), np.array(all_labels), np.array(all_probs)
     class_names = ["Not Stressed", "Stressed"]
 
-    compute_metrics(all_labels, all_preds, config.FUSION_NUM_CLASSES, class_names)
+    compute_metrics(all_labels, all_preds, config.FUSION_NUM_CLASSES, class_names,
+                    os.path.join(config.PLOT_DIR, "fusion_evaluation_report.txt"))
     plot_confusion_matrix(all_labels, all_preds, class_names, "FusionNet Confusion Matrix",
                           os.path.join(config.PLOT_DIR, "fusion_confusion_matrix.png"))
     plot_roc_curve(all_labels, all_probs, config.FUSION_NUM_CLASSES, class_names, "FusionNet ROC Curve",

@@ -192,7 +192,8 @@ def main():
     _, test_acc, test_preds, test_labels = validate(model, test_loader, criterion, device)
 
     class_names = ["Calm", "Stress", "Amusement"]
-    compute_metrics(test_labels, test_preds, config.PHYSIO_NUM_CLASSES, class_names)
+    compute_metrics(test_labels, test_preds, config.PHYSIO_NUM_CLASSES, class_names,
+                    os.path.join(config.PLOT_DIR, "physio_evaluation_report.txt"))
 
     print(f"\n  [OK] Best model saved at: {config.PHYSIO_CHECKPOINT}")
     print(f"  [OK] Training curves at: {os.path.join(config.PLOT_DIR, 'physio_training_curves.png')}")

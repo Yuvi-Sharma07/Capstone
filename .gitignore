@@ -36,6 +36,7 @@ checkpoints/
 
 # Datasets
 Stress analysis from physiological data under pressure WorkStress3D Dataset/
+new dataser/
 *.csv
 *.xlsx
 

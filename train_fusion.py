@@ -176,10 +176,8 @@ def main():
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"  Trainable params (Phase 1 - frozen): {trainable:,}")
 
-    # Class weights for binary
-    labels_list = []
-    for _, _, _, lbl in train_loader:
-        labels_list.extend(lbl.numpy())
+    # Class weights for binary (retrieved directly to save time)
+    labels_list = train_loader.dataset.physio_ds.labels
     class_weights = get_class_weights(np.array(labels_list), config.FUSION_NUM_CLASSES)
     criterion = nn.CrossEntropyLoss(weight=class_weights)
 
@@ -217,7 +215,8 @@ def main():
     print("\n" + "=" * 60 + "\n  EVALUATING ON TEST SET\n" + "=" * 60)
     model.load_state_dict(torch.load(config.FUSION_CHECKPOINT, map_location=device, weights_only=True))
     _, _, tp, tlab = validate(model, test_loader, criterion, device)
-    compute_metrics(tlab, tp, config.FUSION_NUM_CLASSES, ["Not Stressed", "Stressed"])
+    compute_metrics(tlab, tp, config.FUSION_NUM_CLASSES, ["Not Stressed", "Stressed"],
+                    os.path.join(config.PLOT_DIR, "fusion_evaluation_report.txt"))
     print(f"\n  [OK] Best model: {config.FUSION_CHECKPOINT}")
 
 if __name__ == "__main__":

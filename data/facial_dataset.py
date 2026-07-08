@@ -74,11 +74,10 @@ class FacialDataset(Dataset):
         # Convert to uint8 for PIL transforms
         image_uint8 = image.astype(np.uint8)
 
-        if self.augment and idx >= len(self.original_images):
-            # Apply augmentation for augmented copies
+        # Apply augmentation for training if enabled
+        if self.augment:
             image_tensor = self.augment_transform(image_uint8)
         else:
-            # Basic transform for original or validation images
             image_tensor = self.basic_transform(image_uint8)
 
         label = torch.LongTensor([label])[0]
@@ -89,8 +88,10 @@ def get_facial_dataloaders():
     """
     Build train/val/test DataLoaders for facial expression data.
 
-    Loads 83 images, splits 70/15/15 (stratified), and applies
-    20x augmentation on training set.
+    Loads 30,520 images, splits by 'Usage' column:
+    - Training -> Train
+    - PublicTest -> Val
+    - PrivateTest -> Test
 
     Returns:
         train_loader, val_loader, test_loader
@@ -104,33 +105,37 @@ def get_facial_dataloaders():
     print(f"  Loaded {len(df)} facial images")
     print(f"  Class distribution: {df['emotion'].value_counts().to_dict()}")
 
+    # Clean the Usage column
+    df["Usage"] = df["Usage"].str.strip()
+
+    # Split by Usage column
+    train_df = df[df["Usage"] == "Training"]
+    val_df = df[df["Usage"] == "PublicTest"]
+    test_df = df[df["Usage"] == "PrivateTest"]
+
+    print(f"  Train: {len(train_df)} images")
+    print(f"  Val:   {len(val_df)} images")
+    print(f"  Test:  {len(test_df)} images")
+
     # Parse pixel strings to images
-    images = np.array([parse_pixels(p) for p in df["pixels"].values])  # (83, 48, 48)
-    labels = df["emotion"].values.astype(np.int64)
+    print("  Parsing training pixels...")
+    X_train = np.array([parse_pixels(p) for p in train_df["pixels"].values])
+    y_train = train_df["emotion"].values.astype(np.int64)
 
-    # Stratified split: 70% train, 15% val, 15% test
-    X_train, X_temp, y_train, y_temp = train_test_split(
-        images, labels, test_size=0.30, random_state=config.RANDOM_SEED,
-        stratify=labels
-    )
-    X_val, X_test, y_val, y_test = train_test_split(
-        X_temp, y_temp, test_size=0.50, random_state=config.RANDOM_SEED,
-        stratify=y_temp
-    )
+    print("  Parsing validation pixels...")
+    X_val = np.array([parse_pixels(p) for p in val_df["pixels"].values])
+    y_val = val_df["emotion"].values.astype(np.int64)
 
-    print(f"  Train: {len(X_train)} images (before augmentation)")
-    print(f"  Val:   {len(X_val)} images")
-    print(f"  Test:  {len(X_test)} images")
+    print("  Parsing testing pixels...")
+    X_test = np.array([parse_pixels(p) for p in test_df["pixels"].values])
+    y_test = test_df["emotion"].values.astype(np.int64)
 
     # Create datasets
-    train_ds = FacialDataset(
-        X_train, y_train,
-        augment=True, aug_multiplier=config.FACIAL_AUG_MULTIPLIER
-    )
+    train_ds = FacialDataset(X_train, y_train, augment=True, aug_multiplier=config.FACIAL_AUG_MULTIPLIER)
     val_ds = FacialDataset(X_val, y_val, augment=False)
     test_ds = FacialDataset(X_test, y_test, augment=False)
 
-    print(f"  Train dataset size (with {config.FACIAL_AUG_MULTIPLIER}x aug): {len(train_ds)}")
+    print(f"  Train dataset size: {len(train_ds)}")
 
     # Create DataLoaders
     train_loader = DataLoader(train_ds, batch_size=config.FACIAL_BATCH_SIZE,

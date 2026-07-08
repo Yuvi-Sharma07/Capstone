@@ -21,7 +21,8 @@ PHYSIO_15S_PATH = os.path.join(DATASET_ROOT, "PhysiologicalSignals", "physiologi
 PHYSIO_30S_PATH = os.path.join(DATASET_ROOT, "PhysiologicalSignals", "physiological_signals_30sn.csv")
 PHYSIO_60S_PATH = os.path.join(DATASET_ROOT, "PhysiologicalSignals", "physiological_signals_60sn.csv")
 
-FACIAL_PATH = os.path.join(DATASET_ROOT, "TheFacialExpressions", "facial_expression.csv")
+# Use the new 30,520-image facial dataset
+FACIAL_PATH = os.path.join(r"D:\Capstone", "new dataser", "TheFacialExpressions", "facial_dataset_2_class.csv")
 
 SURVEY_PSS_PATH = os.path.join(DATASET_ROOT, "Survey", "generalStressTest.csv")
 SURVEY_PANAS_PATH = os.path.join(DATASET_ROOT, "Survey", "PANAS.csv")
@@ -62,11 +63,11 @@ SURVEY_FEATURE_DIM = 17     # Total survey features per subject
 # ──────────────────────────────────────────────
 FACIAL_IMAGE_SIZE = 48      # 48x48 grayscale
 FACIAL_NUM_CLASSES = 2      # 0=Non-Stress, 1=Stress
-FACIAL_BATCH_SIZE = 8       # Small dataset → small batch
+FACIAL_BATCH_SIZE = 64      # Increased for larger 30K dataset
 FACIAL_LR = 1e-3
 FACIAL_PRETRAINED_LR = 1e-4  # Lower LR for pretrained layers
 FACIAL_EPOCHS = 50
-FACIAL_AUG_MULTIPLIER = 20  # 20x augmentation for 83 images
+FACIAL_AUG_MULTIPLIER = 1   # Set to 1 since we have enough raw images
 
 # ──────────────────────────────────────────────
 # Fusion Model Hyperparameters

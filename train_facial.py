@@ -68,10 +68,8 @@ def main():
 
     train_loader, val_loader, test_loader = get_facial_dataloaders()
 
-    # Class weights
-    train_labels = []
-    for _, labels in train_loader:
-        train_labels.extend(labels.numpy())
+    # Class weights (retrieved directly from dataset to save time)
+    train_labels = train_loader.dataset.original_labels
     class_weights = get_class_weights(np.array(train_labels), config.FACIAL_NUM_CLASSES)
     print(f"\n  Class weights: {class_weights.cpu().numpy()}")
 
@@ -110,7 +108,8 @@ def main():
     print("\n" + "=" * 60 + "\n  EVALUATING ON TEST SET\n" + "=" * 60)
     model.load_state_dict(torch.load(config.FACIAL_CHECKPOINT, map_location=device, weights_only=True))
     _, _, tp, tl = validate(model, test_loader, criterion, device)
-    compute_metrics(tl, tp, config.FACIAL_NUM_CLASSES, ["Non-Stress", "Stress"])
+    compute_metrics(tl, tp, config.FACIAL_NUM_CLASSES, ["Non-Stress", "Stress"],
+                    os.path.join(config.PLOT_DIR, "facial_evaluation_report.txt"))
     print(f"\n  [OK] Best model: {config.FACIAL_CHECKPOINT}")
 
 if __name__ == "__main__":

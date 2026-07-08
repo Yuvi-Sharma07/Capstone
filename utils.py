@@ -59,24 +59,34 @@ def set_seed(seed=42):
     torch.backends.cudnn.benchmark = False
 
 
-def compute_metrics(y_true, y_pred, num_classes, class_names=None):
-    """Compute classification metrics."""
+def compute_metrics(y_true, y_pred, num_classes, class_names=None, save_path=None):
+    """Compute classification metrics and optionally save them to a file."""
     acc = accuracy_score(y_true, y_pred)
     prec = precision_score(y_true, y_pred, average="weighted", zero_division=0)
     rec = recall_score(y_true, y_pred, average="weighted", zero_division=0)
     f1 = f1_score(y_true, y_pred, average="weighted", zero_division=0)
 
-    print(f"\n{'='*50}")
-    print(f"  Accuracy:  {acc:.4f}")
-    print(f"  Precision: {prec:.4f}")
-    print(f"  Recall:    {rec:.4f}")
-    print(f"  F1 Score:  {f1:.4f}")
-    print(f"{'='*50}")
+    output = []
+    output.append(f"\n{'='*50}")
+    output.append(f"  Accuracy:  {acc:.4f}")
+    output.append(f"  Precision: {prec:.4f}")
+    output.append(f"  Recall:    {rec:.4f}")
+    output.append(f"  F1 Score:  {f1:.4f}")
+    output.append(f"{'='*50}")
 
     if class_names is None:
         class_names = [str(i) for i in range(num_classes)]
-    print("\nClassification Report:")
-    print(classification_report(y_true, y_pred, target_names=class_names, zero_division=0))
+    output.append("\nClassification Report:")
+    report = classification_report(y_true, y_pred, target_names=class_names, zero_division=0)
+    output.append(report)
+
+    output_str = "\n".join(output)
+    print(output_str)
+
+    if save_path:
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(output_str)
+        print(f"  [OK] Evaluation report saved to {save_path}")
 
     return {"accuracy": acc, "precision": prec, "recall": rec, "f1": f1}
 
