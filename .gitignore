@@ -43,3 +43,10 @@ new dataser/
 # OS
 .DS_Store
 Thumbs.db
+
+# Capstone Data Collection
+dataset/
+serviceAccountKey.json
+*.wav
+*.jpg
+
