@@ -29,10 +29,10 @@ from models.fusion_model import FusionNet
 def evaluate_physio():
     """Evaluate PhysioNet on test set."""
     print("\n" + "=" * 60)
-    print("  EVALUATING PhysioNet (3-Class)")
+    print("  EVALUATING PhysioNet (2-Class)")
     print("=" * 60)
 
-    _, _, test_loader, n_survey = get_physio_dataloaders(binary_mode=False)
+    _, _, test_loader, n_survey = get_physio_dataloaders(binary_mode=True)
     device = config.DEVICE
 
     model = PhysioNet(len(config.PHYSIO_FEATURES), n_survey, config.PHYSIO_NUM_CLASSES).to(device)
@@ -50,7 +50,7 @@ def evaluate_physio():
             all_probs.extend(probs.cpu().numpy())
 
     all_preds, all_labels, all_probs = np.array(all_preds), np.array(all_labels), np.array(all_probs)
-    class_names = ["Calm", "Stress", "Amusement"]
+    class_names = ["Calm", "Stress"]
 
     compute_metrics(all_labels, all_preds, config.PHYSIO_NUM_CLASSES, class_names,
                     os.path.join(config.PLOT_DIR, "physio_evaluation_report.txt"))

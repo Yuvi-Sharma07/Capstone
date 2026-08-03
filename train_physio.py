@@ -90,7 +90,7 @@ def validate(model, val_loader, criterion, device):
 def main():
     print("\n" + "=" * 60)
     print("  TRAINING PhysioNet (1D-CNN + BiLSTM)")
-    print("  3-Class: Calm / Stress / Amusement")
+    print("  2-Class: Calm / Stress")
     print("=" * 60)
 
     # Setup
@@ -99,7 +99,7 @@ def main():
     print(f"  Device: {device}")
 
     # Load data
-    train_loader, val_loader, test_loader, num_survey_features = get_physio_dataloaders(binary_mode=False)
+    train_loader, val_loader, test_loader, num_survey_features = get_physio_dataloaders(binary_mode=True)
 
     # Compute class weights from training data
     train_labels = []
@@ -191,7 +191,7 @@ def main():
     model.load_state_dict(torch.load(config.PHYSIO_CHECKPOINT, map_location=device, weights_only=True))
     _, test_acc, test_preds, test_labels = validate(model, test_loader, criterion, device)
 
-    class_names = ["Calm", "Stress", "Amusement"]
+    class_names = ["Calm", "Stress"]
     compute_metrics(test_labels, test_preds, config.PHYSIO_NUM_CLASSES, class_names,
                     os.path.join(config.PLOT_DIR, "physio_evaluation_report.txt"))
 

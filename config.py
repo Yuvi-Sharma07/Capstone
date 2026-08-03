@@ -49,7 +49,7 @@ os.makedirs(PLOT_DIR, exist_ok=True)
 PHYSIO_FEATURES = ["eda", "bvp", "temp", "x", "y", "z"]  # 6 raw sensor channels
 WINDOW_SIZE = 200           # Number of timesteps per sliding window
 WINDOW_STRIDE = 100         # 50% overlap
-PHYSIO_NUM_CLASSES = 3      # 0=Calm, 1=Stress, 2=Amusement
+PHYSIO_NUM_CLASSES = 2      # 0=Calm, 1=Stress
 PHYSIO_BATCH_SIZE = 64
 PHYSIO_LR = 1e-3
 PHYSIO_EPOCHS = 50

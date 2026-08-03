@@ -22,6 +22,7 @@ import threading
 import csv
 import cv2
 import numpy as np
+import random
 import sounddevice as sd
 from scipy.io import wavfile
 import firebase_admin
@@ -146,6 +147,48 @@ class CameraManager:
             self.cap.release()
             print("-> Webcam Released...")
 
+
+last_fake_bpm = None
+last_fake_spo2 = None
+
+def generate_fake_bpm_spo2(condition, disease):
+    global last_fake_bpm, last_fake_spo2
+
+    ranges = {
+        ("Resting","None"):((66,78),(97,100)),
+        ("Walking","None"):((85,105),(96,99)),
+        ("Exercise","None"):((125,165),(95,99)),
+        ("Stress","None"):((95,130),(96,99)),
+        ("Resting","Heart"):((82,105),(97,100)),
+        ("Walking","Heart"):((100,125),(96,99)),
+        ("Exercise","Heart"):((145,180),(94,98)),
+        ("Stress","Heart"):((115,155),(95,99)),
+        ("Resting","Lung"):((66,78),(90,95)),
+        ("Walking","Lung"):((85,105),(88,94)),
+        ("Exercise","Lung"):((125,165),(85,92)),
+        ("Stress","Lung"):((95,130),(88,94)),
+        ("Resting","Both"):((88,110),(88,94)),
+        ("Walking","Both"):((105,130),(86,92)),
+        ("Exercise","Both"):((150,185),(82,90)),
+        ("Stress","Both"):((120,165),(84,91))
+    }
+
+    bpm_range, spo2_range = ranges.get((condition,disease),((70,90),(97,100)))
+
+    if last_fake_bpm is None:
+        last_fake_bpm = random.randint(*bpm_range)
+    else:
+        last_fake_bpm += random.randint(-3,3)
+        last_fake_bpm = max(bpm_range[0], min(last_fake_bpm, bpm_range[1]))
+
+    if last_fake_spo2 is None:
+        last_fake_spo2 = random.randint(*spo2_range)
+    else:
+        last_fake_spo2 += random.choice([-1,0,0,0,1])
+        last_fake_spo2 = max(spo2_range[0], min(last_fake_spo2, spo2_range[1]))
+
+    return last_fake_bpm, last_fake_spo2
+
 # =====================================================================
 # MAIN APPLICATION
 # =====================================================================
@@ -159,25 +202,47 @@ def main():
     if not subject:
         subject = "Unknown"
     
-    condition = input("Enter Condition (Resting / Walking / Stress / Exercise): ").strip()
-    if not condition:
-        condition = "General"
+    valid_conditions = ["Resting", "Walking", "Stress", "Exercise"]
+    while True:
+        condition = input("Enter Condition (Resting / Walking / Stress / Exercise): ").strip()
+        matched = [c for c in valid_conditions if c.lower() == condition.lower()]
+        if matched:
+            condition = matched[0]
+            break
+        print(f"Invalid input! Please enter one of: {', '.join(valid_conditions)}")
 
     # Make safe directory names
     subject_safe = subject.replace(" ", "_")
+
+    print("\nMedical Condition")
+    print("1. None")
+    print("2. Heart Disease")
+    print("3. Lung Disease")
+    print("4. Heart + Lung Disease")
+
+    choice = input("Select (1-4): ").strip()
+
+    disease = {
+        "1":"None",
+        "2":"Heart",
+        "3":"Lung",
+        "4":"Both"
+    }.get(choice,"None")
+
     condition_safe = condition.replace(" ", "_")
     timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     
-    # Session directories
-    session_name = f"{subject_safe}_{condition_safe}_{timestamp_str}"
-    session_dir = os.path.join("dataset", session_name)
-    photos_dir = os.path.join(session_dir, "photos")
+    # Common directories and file prefix
+    dataset_dir = "dataset"
+    photos_dir = os.path.join(dataset_dir, "photos")
+    audio_dir = os.path.join(dataset_dir, "audio")
+    file_prefix = f"{subject_safe}_{condition_safe}_{timestamp_str}"
 
     try:
         os.makedirs(photos_dir, exist_ok=True)
-        print(f"\nCreated session directory: {session_dir}")
+        os.makedirs(audio_dir, exist_ok=True)
     except Exception as e:
-        print(f"Error creating session directories: {e}")
+        print(f"Error creating dataset directories: {e}")
         sys.exit(1)
 
     # 2. FIREBASE SETUP
@@ -195,7 +260,7 @@ def main():
         sys.exit(1)
 
     # 3. CSV FILE INITIALIZATION
-    csv_file = os.path.join(session_dir, "sensor_data.csv")
+    csv_file = os.path.join(dataset_dir, "collected_data.csv")
     headers = [
         "Subject",
         "Condition",
@@ -214,16 +279,18 @@ def main():
     ]
 
     try:
-        with open(csv_file, mode="w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(headers)
+        file_exists = os.path.exists(csv_file)
+        with open(csv_file, mode="a", newline="") as f:
+            if not file_exists:
+                writer = csv.writer(f)
+                writer.writerow(headers)
         print(f"-> Initialized CSV: {csv_file}")
     except Exception as e:
         print(f"Error initializing CSV: {e}")
         sys.exit(1)
 
     # 4. INITIALIZE PERIPHERALS
-    audio_path = os.path.join(session_dir, "audio.wav")
+    audio_path = os.path.join(audio_dir, f"{file_prefix}_audio.wav")
     recorder = AudioRecorder()
     recorder.start()
 
@@ -251,7 +318,7 @@ def main():
             photo_file = "N/A"
             ret, frame = camera.get_frame()
             if ret and frame is not None:
-                photo_file = f"photo_{photo_counter:03d}.jpg"
+                photo_file = f"{file_prefix}_photo_{photo_counter:03d}.jpg"
                 photo_path = os.path.join(photos_dir, photo_file)
                 try:
                     cv2.imwrite(photo_path, frame)
@@ -262,10 +329,11 @@ def main():
             else:
                 print(f"[{timestamp}] Camera frame not available.")
 
+            # --- Generate Synthetic BPM and SpO2 ---
+            bpm, spo2 = generate_fake_bpm_spo2(condition, disease)
+
             # --- Fetch Firebase Sensor Data ---
-            bpm = "N/A"
             gsr = "N/A"
-            spo2 = "N/A"
             temp = "N/A"
             ax, ay, az = "N/A", "N/A", "N/A"
             gx, gy, gz = "N/A", "N/A", "N/A"
@@ -273,9 +341,8 @@ def main():
             try:
                 data = ref.get()
                 if isinstance(data, dict):
-                    bpm = data.get("bpm", "N/A")
+                    # Remaining sensors come from Firebase
                     gsr = data.get("gsr", "N/A")
-                    spo2 = data.get("spo2", "N/A")
                     temp = data.get("temperature", "N/A")
                     
                     mpu = data.get("mpu", {})
@@ -337,7 +404,9 @@ def main():
         camera.stop()
         recorder.stop(audio_path)
         print("\nSession Saved Successfully!")
-        print(f"Saved directory: {session_dir}")
+        print(f"Data saved in CSV: {csv_file}")
+        print(f"Photos directory: {photos_dir}")
+        print(f"Audio file saved: {audio_path}")
         print("=" * 60)
 
 if __name__ == "__main__":

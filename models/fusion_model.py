@@ -27,7 +27,7 @@ class FusionNet(nn.Module):
     """
 
     def __init__(self, num_physio_channels=6, num_survey_features=17,
-                 physio_classes=3, facial_classes=2, fusion_classes=2,
+                 physio_classes=2, facial_classes=2, fusion_classes=2,
                  dropout=0.5, freeze_submodels=True):
         super(FusionNet, self).__init__()
 

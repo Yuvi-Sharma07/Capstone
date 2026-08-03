@@ -189,9 +189,14 @@ def get_physio_dataloaders(binary_mode=False):
 
     # Print class distribution
     for name, mask in [("Train", train_mask), ("Val", val_mask), ("Test", test_mask)]:
-        lbl = labels[mask]
-        dist = np.bincount(lbl.astype(int), minlength=3)
-        print(f"  {name} class dist: Calm={dist[0]}, Stress={dist[1]}, Amusement={dist[2]}")
+        lbl = labels[mask].copy()
+        if binary_mode:
+            lbl[lbl == 2] = 0
+            dist = np.bincount(lbl.astype(int), minlength=2)
+            print(f"  {name} class dist: Calm={dist[0]}, Stress={dist[1]}")
+        else:
+            dist = np.bincount(lbl.astype(int), minlength=3)
+            print(f"  {name} class dist: Calm={dist[0]}, Stress={dist[1]}, Amusement={dist[2]}")
 
     # Create datasets
     train_ds = PhysioDataset(windows[train_mask], labels[train_mask], subjects[train_mask],
