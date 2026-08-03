@@ -1,10 +1,10 @@
-# 🧠 NeuroBioSense — Multimodal Stress Detection System
+# NeuroBioSense — Multimodal Stress Detection System
 
 NeuroBioSense is a deep-learning-based multimodal stress detection system that fuses **physiological signals** (EDA, BVP, Temperature, Accelerometer) captured from wearable sensors with **facial expression analysis** from camera inputs. The system classifies a subject's state as **Stressed** or **Not Stressed** (binary classification) using a late-fusion neural network architecture.
 
 ---
 
-## 📁 Project Directory Structure
+## Project Directory Structure
 
 ```
 D:\Capstone\
@@ -53,17 +53,17 @@ D:\Capstone\
 
 ---
 
-## ⚙️ System Architecture
+## System Architecture
 
 ### System Block Diagram
 The following block diagram demonstrates the end-to-end data pipeline and model flow of the NeuroBioSense system:
 
 ```mermaid
 graph TB
-    subgraph Input_Layer["📥 Input Layer"]
-        A["🖐️ Wearable Glove<br/>(EDA, BVP, Temp, Accel X/Y/Z)"]
-        B["📷 Camera<br/>(48×48 Grayscale Face)"]
-        C["📋 Survey Data<br/>(PSS, PANAS, Demographics)"]
+    subgraph Input_Layer["Input Layer"]
+        A["Wearable Glove<br/>(EDA, BVP, Temp, Accel X/Y/Z)"]
+        B["Camera<br/>(48×48 Grayscale Face)"]
+        C["Survey Data<br/>(PSS, PANAS, Demographics)"]
     end
 
     subgraph Data_Pipeline["⚙️ Data Processing Pipeline"]
@@ -82,8 +82,8 @@ graph TB
         J["Late Fusion<br/>Concat(512-d) → FC → BN → ReLU → FC"]
     end
 
-    subgraph Output_Layer["📊 Output"]
-        K["Binary Classification<br/>✅ Not Stressed / ⚠️ Stressed"]
+    subgraph Output_Layer["Output"]
+        K["Binary Classification<br/>Not Stressed / Stressed"]
     end
 
     A --> D --> E --> H
@@ -148,7 +148,7 @@ graph LR
 
 ---
 
-## 🛠️ Technology Stack & Dependencies
+## Technology Stack & Dependencies
 
 The project is built using:
 - **Language**: Python 3.8+
@@ -160,7 +160,7 @@ The project is built using:
 
 ---
 
-## 🧠 Deep Learning Models
+## Deep Learning Models
 
 ### 1. PhysioNet (`models/physio_model.py`)
 - **Inputs**: Physiological signals (6 channels: EDA, BVP, Temperature, Accelerometer X/Y/Z) and Subject Survey features (17 features: PSS, PANAS, Demographics).
@@ -188,13 +188,13 @@ The project is built using:
 
 ---
 
-## ⚙️ Training & Evaluation Pipelines
+## Training & Evaluation Pipelines
 
 ### Training Workflow Activity Diagram
 
 ```mermaid
 graph TD
-    Start([▶ Start]) --> A["Load config.py"]
+    Start([Start]) --> A["Load config.py"]
     A --> B{"GPU Available?"}
     B -->|Yes| C["Set device = CUDA"]
     B -->|No| D["Set device = CPU"]
@@ -225,7 +225,7 @@ graph TD
     U --> V["Save fusion_best.pth"]
     V --> W["Run evaluate.py<br/>on all 3 models"]
     W --> X["Generate plots<br/>(confusion matrix, ROC)"]
-    X --> End([⏹ End])
+    X --> End([End])
 ```
 
 ### FusionNet Two-Phase Training Strategy
@@ -235,7 +235,7 @@ Because the sub-models learn features from different domains, FusionNet is train
 
 ---
 
-## 🚀 How to Run the Project
+## How to Run the Project
 
 ### 1. Installation
 Install all required dependencies using `pip`:
@@ -275,7 +275,7 @@ python evaluate.py --model fusion
 
 ---
 
-## 🎯 Key Design Decisions
+## Key Design Decisions
 1. **Subject-wise Splitting**: Prevents data leakage by ensuring that data from subjects used during training are never present in the validation or test sets (Subject 1-14: Train, 15-17: Validation, 18-20: Test).
 2. **Class Imbalance Handling**: Inverse-frequency weights are dynamically calculated and applied to the loss functions of all three networks.
 3. **Data Augmentation**: Grayscale face datasets are augmented 20-fold using horizontal flips, random rotations, affine translations, and scaling to resolve the constraints of the small image subset (83 samples).
