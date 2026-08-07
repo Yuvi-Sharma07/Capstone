@@ -1,4 +1,4 @@
-# NeuroBioSense — Multimodal Stress Detection System
+# Neural Palp — Multimodal Stress Detection System
 # Complete Project Documentation
 
 ---
@@ -6,14 +6,14 @@
 ## 1. Product Perspective — Block Diagram
 
 ### 1.1 Product Overview
-NeuroBioSense is a deep-learning-based multimodal stress detection system that fuses **physiological signals** (EDA, BVP, Temperature, Accelerometer) captured from wearable sensors with **facial expression analysis** from camera input. The system classifies a subject as **Stressed** or **Not Stressed** in real-time using a late-fusion neural network architecture.
+Neural Palp is a deep-learning-based multimodal stress detection system that fuses **physiological signals** (EDA, BVP, Temperature, Accelerometer) captured from wearable sensors with **facial expression analysis** from camera input. The system classifies a subject as **Stressed** or **Not Stressed** in real-time using a late-fusion neural network architecture.
 
 ### 1.2 System Block Diagram
 
 ```mermaid
 graph TB
     subgraph Input_Layer["📥 Input Layer"]
-        A["🖐️ Wearable Glove<br/>(EDA, BVP, Temp, Accel X/Y/Z)"]
+        A["🖐️ Wearable<br/>(EDA, BVP, Temp, Accel X/Y/Z)"]
         B["📷 Camera<br/>(48×48 Grayscale Face)"]
         C["📋 Survey Data<br/>(PSS, PANAS, Demographics)"]
     end
@@ -108,7 +108,7 @@ graph TB
     User(("👤 Researcher /<br/>End User"))
     Admin(("🔧 System<br/>Administrator"))
 
-    subgraph System["NeuroBioSense System"]
+    subgraph System["Neural Palp System"]
         UC1["UC1: Train PhysioNet Model"]
         UC2["UC2: Train FacialNet Model"]
         UC3["UC3: Train FusionNet Model"]
@@ -293,7 +293,7 @@ graph LR
 
 ```mermaid
 graph TD
-    ROOT["NeuroBioSense<br/>Multimodal Stress Detection"]
+    ROOT["Neural Palp<br/>Multimodal Stress Detection"]
 
     ROOT --> WP1["WP1: Project<br/>Management"]
     ROOT --> WP2["WP2: Data<br/>Engineering"]
@@ -337,7 +337,7 @@ graph TD
 
 ```mermaid
 gantt
-    title NeuroBioSense — Project Schedule
+    title Neural Palp — Project Schedule
     dateFormat  YYYY-MM-DD
     axisFormat  %b %d
 
@@ -430,7 +430,7 @@ gantt
 | # | Component | Specification | Purpose |
 |---|-----------|---------------|---------|
 | 1 | **GPU Workstation** | NVIDIA CUDA-capable GPU (≥4GB VRAM) | Model training acceleration |
-| 2 | **Wearable Sensor Glove** | EDA + BVP + Temperature + 3-axis Accelerometer | Real-time physiological data capture |
+| 2 | **Wearable Sensors** | EDA + BVP + Temperature + 3-axis Accelerometer | Real-time physiological data capture |
 | 3 | **Camera Module** | Minimum 480p, grayscale capable | Facial expression capture |
 | 4 | **Storage** | ≥10 GB SSD | Dataset + checkpoints + plots |
 

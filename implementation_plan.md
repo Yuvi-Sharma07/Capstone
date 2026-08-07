@@ -1,6 +1,6 @@
 # Multimodal Stress Detection — DL Training Pipeline
 
-Train deep learning models on the **WorkStress3D dataset** to detect stress by fusing physiological signals (EDA, BVP, temperature, accelerometer) with facial expression analysis. Trained models will later be used for real-time inference with wearable glove.
+Train deep learning models on the **WorkStress3D dataset** to detect stress by fusing physiological signals (EDA, BVP, temperature, accelerometer) with facial expression analysis. Trained models will later be used for real-time inference with wearables.
 
 ---
 

@@ -1,6 +1,6 @@
 # Neural Palp — Multimodal Stress Detection System
 
-NeuroBioSense is a deep-learning-based multimodal stress detection system that fuses **physiological signals** (EDA, BVP, Temperature, Accelerometer) captured from wearable sensors with **facial expression analysis** from camera inputs. The system classifies a subject's state as **Stressed** or **Not Stressed** (binary classification) using a late-fusion neural network architecture.
+Neural Palp is a deep-learning-based multimodal stress detection system that fuses **physiological signals** (EDA, BVP, Temperature, Accelerometer) captured from wearable sensors with **facial expression analysis** from camera inputs. The system classifies a subject's state as **Stressed** or **Not Stressed** (binary classification) using a late-fusion neural network architecture.
 
 It also contains a real-time data collection pipeline integrated with Firebase, webcam capture, and audio recording.
 
@@ -65,12 +65,12 @@ D:\Capstone\
 ## ⚡ System Architecture
 
 ### System Block Diagram
-The following block diagram demonstrates the end-to-end data pipeline and model flow of the NeuroBioSense system:
+The following block diagram demonstrates the end-to-end data pipeline and model flow of the Neural Palp system:
 
 ```mermaid
 graph TB
     subgraph Input_Layer["Input Layer"]
-        A["Wearable Glove<br/>(EDA, BVP, Temp, Accel X/Y/Z)"]
+        A["Wearable<br/>(EDA, BVP, Temp, Accel X/Y/Z)"]
         B["Camera<br/>(48×48 Grayscale Face)"]
         C["Survey Data<br/>(PSS, PANAS, Demographics)"]
     end
